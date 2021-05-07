@@ -132,15 +132,15 @@ int main() {
 	while(head < 0 || head > DISKS - 1) {
 		scanf("%d", &head); 
 	}
-    printf("__________________________________\n");
-    printf("| Algorithm | Total Head Movement \n"); 
-    printf("|___________|_____________________\n");
-    printf("| FCFS:     | %d\n", FCFS(cylinders,  head)); 
-    printf("| SSTF:     | %d\n", SSTF(cylinders,  head)); 
-    printf("| SCAN:     | %d\n", SCAN(cylinders,  head));
-    printf("| CSCAN:    | %d\n", CSCAN(cylinders, head)); 
-    printf("| LOOK:     | %d\n", LOOK(cylinders,  head));  
-    printf("|___________|_____________________\n");
+    printf("_____________________________\n");
+    printf("| Algorithm | Head Movement |\n"); 
+    printf("|___________|_______________|\n");
+    printf("| FCFS:     | % 13d |\n", FCFS(cylinders,  head)); 
+    printf("| SSTF:     | % 13d |\n", SSTF(cylinders,  head)); 
+    printf("| SCAN:     | % 13d |\n", SCAN(cylinders,  head));
+    printf("| CSCAN:    | % 13d |\n", CSCAN(cylinders, head)); 
+    printf("| LOOK:     | % 13d |\n", LOOK(cylinders,  head));  
+    printf("|___________|_______________|\n");
 	return 0;
 }
 
