@@ -8,10 +8,27 @@
 #define DISKS 10000
 #define REQUESTS 1000
 
+// Function Delcarations:
+int getHeadPos(int upperBound);                                 // get starting head position
 int getDistance(int start, int end);                            // Calculates distance between start and end: 'abs(end - start)'
 void generateRequests(int *cylinders, int upperLimit, int num); // Generates 'num' random cylinder requests from 0 to 'upperLimit' and stores them in 'cylinders[]' 
 int cmpfunc (const void * a, const void * b);
+void printResults(int *cylinders, int head);                    // Prints results of each algorithm in a table
+int FCFS (int cylinders[], int head);
+int SSTF (int cylinders[], int head);
+int SCAN (int cylinders[], int head);
+int CSCAN(int cylinders[], int head);
+int LOOK (int cylinders[], int head);
 
+// Main:
+int main() {
+    int cylinders[REQUESTS], head = getHeadPos(DISKS);
+    generateRequests(cylinders, DISKS, REQUESTS);
+    printResults(cylinders, head);
+	return 0;
+}
+
+// Function Definitions:
 /* FCFS: Requests are addressed in the order they arrive in the disk queue */
 int FCFS(int cylinders[], int head) {
     int distanceTraveled = 0;
@@ -51,23 +68,23 @@ After reaching the end of disk, it reverses its direction and again services the
 int SCAN(int cylinders[], int head) {
     int distanceTraveled = 0;
     int leftSize = 0, rightSize = 0;
-	int leftVals[REQUESTS], rightVals[REQUESTS]; 
-    for(int i = 0; i < REQUESTS; i++) { 
+	int leftVals[REQUESTS], rightVals[REQUESTS];              // Declare arrays to store sorted values to the left and right of head
+    for(int i = 0; i < REQUESTS; i++) {                       // Sort cylinders into rightVals and leftVals arrays
 		if(cylinders[i] > head) 
 			rightVals[rightSize++] = cylinders[i]; 
 		else
 			leftVals[leftSize++]   = cylinders[i]; 
 	}
-    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); 
+    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); // Sort rightVals and leftVals arrays
 	qsort(rightVals, rightSize, sizeof(*rightVals), cmpfunc); 
-    for(int i = leftSize - 1; i >= 0; i--){ 
-		distanceTraveled += getDistance(leftVals[i], head);
-		head = leftVals[i];
+    for(int i = leftSize - 1; i >= 0; i--){                   // Start going left from head
+		distanceTraveled += getDistance(leftVals[i], head);   // Count distance traveled to get to each disk
+		head = leftVals[i];                                   // Move head to new disk
 	}
-    distanceTraveled += getDistance(0, head);
+    distanceTraveled += getDistance(0, head);                 // Head needs to travel to the end of the disk before changing direction (unlike in look)
 	head = 0;
-	for(int i = 0; i < rightSize; i++){
-		distanceTraveled += getDistance(rightVals[i], head);
+	for(int i = 0; i < rightSize; i++){                       // After turning around, go and visit cylinders to the right of head
+		distanceTraveled += getDistance(rightVals[i], head);  
 		head = rightVals[i];
 	}
     return distanceTraveled;
@@ -77,24 +94,24 @@ int SCAN(int cylinders[], int head) {
 int CSCAN(int cylinders[], int head) {
     int distanceTraveled = 0;
     int leftSize = 0, rightSize = 0;
-	int leftVals[REQUESTS], rightVals[REQUESTS]; 
-    for(int i = 0; i < REQUESTS; i++) { 
+	int leftVals[REQUESTS], rightVals[REQUESTS];               // Declare arrays to store sorted values to the left and right of head
+    for(int i = 0; i < REQUESTS; i++) {                        // Sort cylinders into rightVals and leftVals arrays
 		if(cylinders[i] > head) 
 			rightVals[rightSize++] = cylinders[i]; 
 		else
 			leftVals[leftSize++]   = cylinders[i]; 
 	}
-    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); 
+    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); // Sort rightVals and leftVals arrays
 	qsort(rightVals, rightSize, sizeof(*rightVals), cmpfunc); 
-    for(int i = leftSize - 1; i >= 0; i--){ 
-		distanceTraveled += getDistance(leftVals[i], head);
-		head = leftVals[i];
+    for(int i = leftSize - 1; i >= 0; i--){                   // Start going left from head
+		distanceTraveled += getDistance(leftVals[i], head);   // Count distance traveled to get to each disk
+		head = leftVals[i];                                   // Move head to new disk
 	}
-    distanceTraveled += getDistance(0, head);
+    distanceTraveled += getDistance(0, head);                 // Head needs to travel to the end of the disk before going to the other side (unlike in C-LOOK)
 	head = 0; 
-	for(int i = rightSize - 1; i >= 0; i--){ 
+	for(int i = rightSize - 1; i >= 0; i--){                  // Start from the other end of the disk
         distanceTraveled += getDistance(rightVals[i], head);
-		head = rightVals[i]; // New Head Value
+		head = rightVals[i];
 	}
     return distanceTraveled;
 }
@@ -104,44 +121,34 @@ Thus it prevents the extra delay which occurred due to unnecessary traversal to 
 int LOOK(int cylinders[], int head) {
     int distanceTraveled = 0;
     int leftSize = 0, rightSize = 0;
-	int leftVals[REQUESTS], rightVals[REQUESTS]; 
-    for(int i = 0; i < REQUESTS; i++) { 
+	int leftVals[REQUESTS], rightVals[REQUESTS];              // Declare arrays to store sorted values to the left and right of head
+    for(int i = 0; i < REQUESTS; i++) {                       // Sort cylinders into rightVals and leftVals arrays
 		if(cylinders[i] > head) 
 			rightVals[rightSize++] = cylinders[i]; 
 		else
 			leftVals[leftSize++]   = cylinders[i]; 
 	}
-    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); 
+    qsort(leftVals,  leftSize,  sizeof(*leftVals),  cmpfunc); // Sort rightVals and leftVals arrays
 	qsort(rightVals, rightSize, sizeof(*rightVals), cmpfunc); 
-    for(int i = leftSize - 1; i >= 0; i--){ 
-		distanceTraveled += getDistance(leftVals[i], head);
-		head = leftVals[i];
+    for(int i = leftSize - 1; i >= 0; i--){                   // Start going left from head
+		distanceTraveled += getDistance(leftVals[i], head);   // Count distance traveled to get to each disk
+		head = leftVals[i];                                   // Move head to new disk
 	}
     // Unlike with SCAN, we don't move the head to the end of the disk, but reverse direction after last requested disk in this direction
-	for(int i = 0; i < rightSize; i++){
+	for(int i = 0; i < rightSize; i++){                       // After turning around, go and visit cylinders to the right of head
 		distanceTraveled += getDistance(rightVals[i], head);
 		head = rightVals[i];
 	}
     return distanceTraveled;
 }
 
-int main() {
-    int cylinders[REQUESTS], head;
-    generateRequests(cylinders, DISKS, REQUESTS);
-	scanf("%d", &head); 
-	while(head < 0 || head > DISKS - 1) {
+int getHeadPos(int upperBound) { // get starting head position
+    int head = INT_MIN;
+    while(head < 0 || head >= upperBound) {
+        printf("\nEnter valid starting position for Head (in the range of 0 to %d): ", upperBound-1);
 		scanf("%d", &head); 
 	}
-    printf("_____________________________\n");
-    printf("| Algorithm | Head Movement |\n"); 
-    printf("|___________|_______________|\n");
-    printf("| FCFS:     | % 13d |\n", FCFS(cylinders,  head)); 
-    printf("| SSTF:     | % 13d |\n", SSTF(cylinders,  head)); 
-    printf("| SCAN:     | % 13d |\n", SCAN(cylinders,  head));
-    printf("| CSCAN:    | % 13d |\n", CSCAN(cylinders, head)); 
-    printf("| LOOK:     | % 13d |\n", LOOK(cylinders,  head));  
-    printf("|___________|_______________|\n");
-	return 0;
+    return head;
 }
 
 int getDistance(int start, int end) { // distance between start and end is 'abs(end - start)'
@@ -158,4 +165,15 @@ void generateRequests(int *cylinders, int upperLimit, int num) { // Generates nu
         cylinders[i] = rand() % upperLimit; // Fill each index with a random int where 0 ≤ int < upperLimit
     }
 }
-// Note: Algorithm information above was taken from https://www.geeksforgeeks.org/disk-scheduling-algorithms/
+
+void printResults(int *cylinders, int head){ // Prints results of each algorithm in a table
+    printf("_____________________________\n");
+    printf("| Algorithm | Head Movement |\n"); 
+    printf("|___________|_______________|\n");
+    printf("| FCFS:     | % 13d |\n", FCFS(cylinders,  head)); 
+    printf("| SSTF:     | % 13d |\n", SSTF(cylinders,  head)); 
+    printf("| SCAN:     | % 13d |\n", SCAN(cylinders,  head));
+    printf("| CSCAN:    | % 13d |\n", CSCAN(cylinders, head)); 
+    printf("| LOOK:     | % 13d |\n", LOOK(cylinders,  head));  
+    printf("|___________|_______________|\n");
+}                    
