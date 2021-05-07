@@ -134,8 +134,8 @@ int main() {
 	}
     printf("__________________________________\n");
     printf("| Algorithm | Total Head Movement \n"); 
-	printf("|___________|_____________________\n");
-	printf("| FCFS:     | %d\n", FCFS(cylinders,  head)); 
+    printf("|___________|_____________________\n");
+    printf("| FCFS:     | %d\n", FCFS(cylinders,  head)); 
     printf("| SSTF:     | %d\n", SSTF(cylinders,  head)); 
     printf("| SCAN:     | %d\n", SCAN(cylinders,  head));
     printf("| CSCAN:    | %d\n", CSCAN(cylinders, head)); 
